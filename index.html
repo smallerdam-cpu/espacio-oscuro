@@ -1,19 +1,200 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Game Main Menu</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Espacio Oscuro - Dark Orbit 2D</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="menu">
-        <h1>Welcome to Space Game</h1>
-        <button onclick="startGame()">Start Game</button>
-        <button onclick="loadGame()">Load Game</button>
-        <button onclick="showSettings()">Settings</button>
-        <button onclick="exitGame()">Exit</button>
+    <!-- MENÚ PRINCIPAL -->
+    <div id="mainMenu" class="menu-container">
+        <div class="menu-content">
+            <h1 class="game-title">ESPACIO OSCURO</h1>
+            <p class="game-subtitle">Dark Orbit 2D - Batalla Intergaláctica</p>
+            <div class="menu-buttons">
+                <button onclick="startGame()" class="btn-primary">JUGAR</button>
+                <button onclick="openSettings()" class="btn-secondary">CONFIGURACIÓN</button>
+                <button onclick="openProfile()" class="btn-secondary">PERFIL</button>
+            </div>
+        </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- MENÚ DE CONFIGURACIÓN -->
+    <div id="settingsMenu" class="menu-container hidden">
+        <div class="menu-content">
+            <h2>CONFIGURACIÓN</h2>
+            <div class="settings-group">
+                <label>
+                    <input type="checkbox" id="soundToggle" checked> Sonido
+                </label>
+                <label>
+                    <input type="checkbox" id="musicToggle" checked> Música
+                </label>
+                <label>
+                    Volumen: <input type="range" id="volumeControl" min="0" max="100" value="50">
+                </label>
+            </div>
+            <div class="settings-group">
+                <label>
+                    Dificultad:
+                    <select id="difficultySelect">
+                        <option value="easy">Fácil</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="hard">Difícil</option>
+                    </select>
+                </label>
+            </div>
+            <button onclick="backToMenu()" class="btn-primary">VOLVER</button>
+        </div>
+    </div>
+
+    <!-- MENÚ DE PERFIL -->
+    <div id="profileMenu" class="menu-container hidden">
+        <div class="menu-content">
+            <h2>PERFIL DEL JUGADOR</h2>
+            <div class="profile-info">
+                <p>Nivel: <span id="profileLevel">1</span></p>
+                <p>Rango: <span id="profileRank">Soldado</span></p>
+                <p>Créditos: <span id="profileCredits">0</span></p>
+                <p>Experiencia: <span id="profileExp">0</span></p>
+            </div>
+            <button onclick="backToMenu()" class="btn-primary">VOLVER</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DEL JUEGO -->
+    <div id="gameScreen" class="hidden">
+        <canvas id="gameCanvas"></canvas>
+        <div id="hud">
+            <!-- BARRA DE INFORMACIÓN DEL JUGADOR -->
+            <div class="hud-top">
+                <div class="hud-stats">
+                    <span>Nivel: <span id="hudLevel">1</span></span>
+                    <span>Rango: <span id="hudRank">Soldado</span></span>
+                    <span>Créditos: <span id="hudCredits">0</span></span>
+                </div>
+                <button onclick="pauseGame()" class="btn-pause">⏸ PAUSA</button>
+            </div>
+
+            <!-- BARRA DE MUNICIÓN Y HABILIDADES -->
+            <div class="hud-weapons">
+                <div class="weapon-slot" onclick="selectWeapon(1)" id="weapon1">
+                    <span>1</span> Láser Básico
+                </div>
+                <div class="weapon-slot" onclick="selectWeapon(2)" id="weapon2">
+                    <span>2</span> Láser Plasma
+                </div>
+                <div class="weapon-slot" onclick="selectWeapon(3)" id="weapon3">
+                    <span>3</span> Láser Ión
+                </div>
+                <div class="weapon-slot" onclick="selectWeapon(4)" id="weapon4">
+                    <span>4</span> Misil
+                </div>
+            </div>
+
+            <!-- HABILIDADES -->
+            <div class="hud-abilities">
+                <div class="ability-slot" id="ability1" title="Daño Temporal +20%">
+                    <span>E</span> Potencia
+                </div>
+                <div class="ability-slot" id="ability2" title="Escudo +15%">
+                    <span>R</span> Escudo
+                </div>
+            </div>
+
+            <!-- MINIMAP -->
+            <div class="minimap">
+                <canvas id="minimapCanvas"></canvas>
+            </div>
+
+            <!-- CONTROL DE HANGAR -->
+            <div class="hangar-control">
+                <button onclick="openBase()" class="btn-base">BASE</button>
+                <button onclick="toggleShop()" class="btn-shop">TIENDA</button>
+            </div>
+        </div>
+
+        <!-- MENÚ DE PAUSA -->
+        <div id="pauseMenu" class="menu-container hidden">
+            <div class="menu-content">
+                <h2>JUEGO PAUSADO</h2>
+                <div class="menu-buttons">
+                    <button onclick="resumeGame()" class="btn-primary">CONTINUAR</button>
+                    <button onclick="openBase()" class="btn-secondary">IR A BASE</button>
+                    <button onclick="backToMainMenu()" class="btn-secondary">MENÚ PRINCIPAL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MENÚ DE BASE (ZONA SEGURA) -->
+    <div id="baseMenu" class="menu-container hidden">
+        <div class="menu-content">
+            <h2>BASE - ZONA SEGURA</h2>
+            <div class="base-tabs">
+                <button onclick="showBaseTab('ships')" class="tab-btn active">Naves</button>
+                <button onclick="showBaseTab('equipment')" class="tab-btn">Equipamiento</button>
+                <button onclick="showBaseTab('upgrades')" class="tab-btn">Mejoras</button>
+            </div>
+            
+            <div id="shipsTab" class="base-tab">
+                <!-- Aquí van las naves disponibles -->
+            </div>
+            
+            <div id="equipmentTab" class="base-tab hidden">
+                <!-- Aquí va el equipamiento -->
+            </div>
+            
+            <div id="upgradesTab" class="base-tab hidden">
+                <!-- Aquí van las mejoras -->
+            </div>
+
+            <button onclick="exitBase()" class="btn-primary">SALIR</button>
+        </div>
+    </div>
+
+    <!-- TIENDA -->
+    <div id="shopMenu" class="menu-container hidden">
+        <div class="menu-content">
+            <h2>TIENDA</h2>
+            <div class="shop-tabs">
+                <button onclick="showShopTab('weapons')" class="tab-btn active">Armas</button>
+                <button onclick="showShopTab('shields')" class="tab-btn">Escudos</button>
+                <button onclick="showShopTab('boosters')" class="tab-btn">Potenciadores</button>
+                <button onclick="showShopTab('abilities')" class="tab-btn">Habilidades</button>
+            </div>
+
+            <div id="weaponsTab" class="shop-tab">
+                <!-- Aquí van las armas -->
+            </div>
+            
+            <div id="shieldsTab" class="shop-tab hidden">
+                <!-- Aquí van los escudos -->
+            </div>
+            
+            <div id="boostersTab" class="shop-tab hidden">
+                <!-- Aquí van los potenciadores -->
+            </div>
+            
+            <div id="abilitiesTab" class="shop-tab hidden">
+                <!-- Aquí van las habilidades -->
+            </div>
+
+            <div class="shop-footer">
+                <p>Créditos disponibles: <span id="shopCredits">0</span></p>
+                <button onclick="closeShop()" class="btn-primary">CERRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="js/config.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemies.js"></script>
+    <script src="js/maps.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
 </body>
 </html>
